@@ -1,5 +1,5 @@
-#Reproducible research Assignment 1
-##1. Code for reading data
+# Reproducible research Assignment 1
+## Code for reading data
 
 
 ```r
@@ -20,7 +20,7 @@ library(ggplot2)
 file = read.csv("activity.csv")
 ```
 
-##2. Histogram of total number of steps taken each day
+## Histogram of total number of steps taken each day
 
 ```r
 file1<- file  %>% filter(!is.na(steps)) 
@@ -43,7 +43,7 @@ ggp +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  +
 
 ![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
-##3. Mean and median for daily total
+## Mean and median for daily total
 
 
 ```r
@@ -60,7 +60,7 @@ summary1<- summary(sums$dailytotal)
 
 ### The median is ``10765`` and mean is ``10766.19`` for total number of steps taken per day
 
-##4. Time series plot for average number of steps taken (averaged on intervals across all days)
+## Time series plot for average number of steps taken (averaged on intervals across all days)
 
 
 ```r
@@ -71,7 +71,7 @@ plot( type = "l", ave1$interval, ave1$averageSteps, xaxp =c(0,2400, n= 100))
 
 ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
-##5. Interval corresponding to highest average steps 
+## Interval corresponding to highest average steps 
 
 
 ```r
@@ -88,7 +88,7 @@ higheststeps
 
 ### The 5-minute interval 835 contains the maximum number of steps which is 206.1698113 on average across all the days in the dataset.
 
-##6. Code to describe a strategy for imputing missing data and summary of daily total steps
+## Code to describe a strategy for imputing missing data and summary of daily total steps
 
 ```r
 #impute missing values with averages of intervals which is more accurate than daily averages.
@@ -113,7 +113,7 @@ summary2
 ```
 ### The mean is 10765.64 and median is 10762 after imputing data. (total number od steps per day)
 
-##7. Histogram of the total number of steps taken each day after missing values are imputed
+## Histogram of the total number of steps taken each day after missing values are imputed
 
 ```r
 ggp1 <- ggplot(data=sums2 , aes(x=date, y = dailytotal ))
@@ -134,7 +134,7 @@ ggp1 +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  +
 
 ### Since the imputed values are the mean of the intervals, they seems to introduce small difference in the mean and median values, but overall, they do not change the patterns very much.
 
-##8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
+## Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
 
 ```r
