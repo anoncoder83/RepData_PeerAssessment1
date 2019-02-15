@@ -1,26 +1,43 @@
+---
+output: 
+  html_document: 
+    keep_md: yes
+---
 #Reproducible research Assignment 1
-##1. Code for reading data
+##1. code for reading data
 
-```{r setup}
-#initial setup
-knitr::opts_chunk$set(
-  echo = TRUE, fig.path = "figure/"
-)
 
+```r
 library(dplyr)
-library(tidyr)
-library(ggplot2)
-
 ```
 
-```{r echo=TRUE}
-#read file
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
+library(tidyr)
+library(ggplot2)
 
 file = read.csv("activity.csv")
 ```
 
 ##2. Histogram of total number of steps taken each day
-```{r echo=TRUE}
+
+```r
 file1<- file  %>% filter(!is.na(steps)) 
 sums <- file1 %>% group_by(date) %>% summarise(dailytotal = sum(steps))
 
@@ -29,43 +46,58 @@ ggp <- ggplot(data=sums , aes(x=date, y = dailytotal ))
 ggp +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  + 
   labs(y = "Steps", title = "Histogram of daily total steps") + 
   geom_histogram(stat="identity", show.legend = FALSE,  inherit.aes = TRUE, binwidth = 0.5, pad= 0, bins= 61)
-
+```
 
 ```
+## Warning: Duplicated aesthetics after name standardisation: pad
+```
+
+```
+## Warning: Ignoring unknown parameters: binwidth, bins, pad
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
 ##3. Mean and median for daily total
 
-```{r echo=TRUE}
-summary1<- summary(sums$dailytotal)
- median1 <- summary1[3]
- mean1 <-  summary1[4]
- summary1
+
+```r
+summary(sums$dailytotal)
 ```
 
-### The median is ```r format(median1, scientific=FALSE)``` and mean is ```r format(mean1, scientific=FALSE)``` for total number of steps taken per day
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8841   10765   10766   13294   21194
+```
 
 ##4. Time series plot for average number of steps taken (averaged on intervals across all days)
 
-```{r echo=TRUE}
+
+```r
 file2 <- file1 %>%  select(interval, steps) %>% group_by(interval) 
 ave1 <- file2 %>% summarise(averageSteps= mean(steps))
 plot( type = "l", ave1$interval, ave1$averageSteps, xaxp =c(0,2400, n= 100))
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ##5. Interval corresponding to highest average steps 
 
-```{r echo=TRUE}
-higheststeps<- ave1[ave1$averageSteps == max(ave1$averageSteps),]
-higheststeps
 
+```r
+ave1[ave1$averageSteps == max(ave1$averageSteps),]
 ```
 
-### The 5-minute interval `r higheststeps[1]` contains the maximum number of steps which is `r higheststeps[2]` on average across all the days in the dataset.
+```
+## # A tibble: 1 x 2
+##   interval averageSteps
+##      <int>        <dbl>
+## 1      835         206.
+```
 
 ##6. Code to describe a strategy for imputing missing data and summary of daily total steps
-```{r echo=TRUE}
 
+```r
 #impute missing values with averages of intervals which is more accurate than daily averages.
 file3 <- left_join(file, ave1, by= c("interval" = "interval")) %>%
   mutate(aveStepsInt =as.integer(round(averageSteps)))
@@ -74,29 +106,46 @@ file31 <- file3 %>%  mutate(newSteps = coalesce(file3$steps,file3$aveStepsInt)) 
 
 sums2 <- file31 %>% group_by(date) %>% summarise(dailytotal = sum(newSteps))
 
-summary2 <-summary(sums2$dailytotal)
-summary2
-
-#file31[is.na(file31$newSteps),] # 0 rows . all NA s have been replaced with interval average values
+summary(sums2$dailytotal)
+```
 
 ```
-### The mean is `r format(summary2[4], scientific=FALSE)` and median is `r format(summary2[3], scientific = FALSE)` after imputing data. (total number od steps per day)
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9819   10762   10766   12811   21194
+```
+
+```r
+file31[is.na(file31$newSteps),] # 0 rows . all NA s have been replaced with interval average values
+```
+
+```
+## [1] date     interval newSteps
+## <0 rows> (or 0-length row.names)
+```
 
 ##7. Histogram of the total number of steps taken each day after missing values are imputed
-```{r echo=TRUE}
+
+```r
 ggp1 <- ggplot(data=sums2 , aes(x=date, y = dailytotal ))
 ggp1 +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  + 
   labs(y = "Steps", title = "Histogram of daily total steps with imputed values") + 
   geom_histogram(stat="identity", show.legend = FALSE,  inherit.aes = TRUE,binwidth = 0.5, pad= 0, bins= 61)
-  
 ```
 
-### Since the imputed values are the mean of the intervals, they seems to introduce small difference in the mean and median values, but overall, they do not change the patterns very much.
+```
+## Warning: Duplicated aesthetics after name standardisation: pad
+```
+
+```
+## Warning: Ignoring unknown parameters: binwidth, bins, pad
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 ##8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
-```{r echo=TRUE}
 
+```r
 #3.1 create a new factor variable weekday/weekend
 
 file4 <- file31 %>% mutate(day = weekdays(as.Date(date))) %>%
@@ -107,8 +156,6 @@ ave2 <- file4 %>% summarise(averageSteps= mean(newSteps))
 
 ggp2 <- ggplot(data= ave2)
 ggp2 + geom_line(aes(x=ave2$interval, y=ave2$averageSteps)) + facet_grid(dayofweek ~ .) + ylab("No of steps")+ xlab(" Interval")
-
-
 ```
 
-### INFERENCE: There is a diffrenece between weekday and weekend patterns. The person has less activity in the early morning on weekends.(seems to get up late on weekends) The person also has more activity in evenings in weekends.(likely that he/she is going out in evenings)
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
