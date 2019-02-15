@@ -1,36 +1,21 @@
----
-output: 
-  html_document: 
-    keep_md: yes
----
 #Reproducible research Assignment 1
-##1. code for reading data
+##1. Code for reading data
 
 
 ```r
+#initial setup
+knitr::opts_chunk$set(
+  echo = TRUE, fig.path = "figure/"
+)
+
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 library(tidyr)
 library(ggplot2)
+```
+
+
+```r
+#read file
 
 file = read.csv("activity.csv")
 ```
@@ -56,19 +41,24 @@ ggp +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  +
 ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 ##3. Mean and median for daily total
 
 
 ```r
-summary(sums$dailytotal)
+summary1<- summary(sums$dailytotal)
+ median1 <- summary1[3]
+ mean1 <-  summary1[4]
+ summary1
 ```
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##      41    8841   10765   10766   13294   21194
 ```
+
+### The median is ``10765`` and mean is ``10766.19`` for total number of steps taken per day
 
 ##4. Time series plot for average number of steps taken (averaged on intervals across all days)
 
@@ -79,13 +69,14 @@ ave1 <- file2 %>% summarise(averageSteps= mean(steps))
 plot( type = "l", ave1$interval, ave1$averageSteps, xaxp =c(0,2400, n= 100))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
 ##5. Interval corresponding to highest average steps 
 
 
 ```r
-ave1[ave1$averageSteps == max(ave1$averageSteps),]
+higheststeps<- ave1[ave1$averageSteps == max(ave1$averageSteps),]
+higheststeps
 ```
 
 ```
@@ -94,6 +85,8 @@ ave1[ave1$averageSteps == max(ave1$averageSteps),]
 ##      <int>        <dbl>
 ## 1      835         206.
 ```
+
+### The 5-minute interval 835 contains the maximum number of steps which is 206.1698113 on average across all the days in the dataset.
 
 ##6. Code to describe a strategy for imputing missing data and summary of daily total steps
 
@@ -106,7 +99,8 @@ file31 <- file3 %>%  mutate(newSteps = coalesce(file3$steps,file3$aveStepsInt)) 
 
 sums2 <- file31 %>% group_by(date) %>% summarise(dailytotal = sum(newSteps))
 
-summary(sums2$dailytotal)
+summary2 <-summary(sums2$dailytotal)
+summary2
 ```
 
 ```
@@ -115,13 +109,9 @@ summary(sums2$dailytotal)
 ```
 
 ```r
-file31[is.na(file31$newSteps),] # 0 rows . all NA s have been replaced with interval average values
+#file31[is.na(file31$newSteps),] # 0 rows . all NA s have been replaced with interval average values
 ```
-
-```
-## [1] date     interval newSteps
-## <0 rows> (or 0-length row.names)
-```
+### The mean is 10765.64 and median is 10762 after imputing data. (total number od steps per day)
 
 ##7. Histogram of the total number of steps taken each day after missing values are imputed
 
@@ -140,7 +130,9 @@ ggp1 +  theme(axis.text.x = element_text(angle = 90, hjust = 1))  +
 ## Warning: Ignoring unknown parameters: binwidth, bins, pad
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+
+### Since the imputed values are the mean of the intervals, they seems to introduce small difference in the mean and median values, but overall, they do not change the patterns very much.
 
 ##8. Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
@@ -158,4 +150,6 @@ ggp2 <- ggplot(data= ave2)
 ggp2 + geom_line(aes(x=ave2$interval, y=ave2$averageSteps)) + facet_grid(dayofweek ~ .) + ylab("No of steps")+ xlab(" Interval")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+
+### INFERENCE: There is a diffrenece between weekday and weekend patterns. The person has less activity in the early morning on weekends.(seems to get up late on weekends) The person also has more activity in evenings in weekends.(likely that he/she is going out in evenings)
